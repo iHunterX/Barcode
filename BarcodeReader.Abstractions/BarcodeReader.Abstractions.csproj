@@ -8,8 +8,5 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>bin\Release</OutputPath>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BarcodeReader.Abstractions\BarcodeReader.Abstractions.csproj" />
-  </ItemGroup>
 
 </Project>
