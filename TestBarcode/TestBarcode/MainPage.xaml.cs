@@ -12,13 +12,13 @@ namespace TestBarcode
 	{
 		public MainPage()
 		{
-			InitializeComponent();
+			InitializeComponent();            
 		}
 
         private async void QRScan_OnClicked(object sender, EventArgs e)
         {
             var qrcode = await CrossBarcodeReaderService.Current.ScanQRCode("Align the QR Code at the screen center.");
-
+            
             await DisplayAlert("Result", qrcode, "OK");
         }
         

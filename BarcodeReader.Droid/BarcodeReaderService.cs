@@ -1,4 +1,5 @@
-﻿using BarcodeReader.Abstractions;
+﻿using Android.App;
+using BarcodeReader.Abstractions;
 using BarcodeReader.Abstractions.Models;
 using System.Threading.Tasks;
 
@@ -8,7 +9,10 @@ namespace BarcodeReader
     {
         public async Task<string> ScanQRCode(string message, string closeButtonTitle = "Close", bool tryInverted = false)
         {
-            return await ScanQrController.ScanQRCode(message,closeButtonTitle,ViewHelper.CurrentActivity, tryInverted);
+            //  var activity = ViewHelper.CurrentActivity;
+            var activity = ViewHelper.CurrentActivity;
+
+            return await ScanQrController.ScanQRCode(message,closeButtonTitle, activity, tryInverted);
         }
 
         public Task<bool> ScanQRCodeContinously(string message, QRCodeScanned onQrCodeScannedFunction, string closeButtonTitle = "Close", bool tryInverted = false)

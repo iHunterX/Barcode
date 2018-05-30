@@ -17,7 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBarcode.Android", "Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBarcode.iOS", "TestBarcode\TestBarcode.iOS\TestBarcode.iOS.csproj", "{E1AA3F49-4E45-48F3-978F-649E22042EBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBarcode", "TestBarcode\TestBarcode\TestBarcode.csproj", "{C31E186B-7681-48AE-9C59-F09618211346}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBarcode", "TestBarcode\TestBarcode\TestBarcode.csproj", "{C31E186B-7681-48AE-9C59-F09618211346}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0F33DA4-CEB0-4F08-B48A-B378E93925CC}"
+	ProjectSection(SolutionItems) = preProject
+		Barcode.nuspec = Barcode.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
