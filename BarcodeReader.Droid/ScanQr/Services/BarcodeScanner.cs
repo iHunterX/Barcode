@@ -46,6 +46,36 @@ namespace BarcodeReader.ScanQr.Services
                 return Android.App.Application.Context;
         }
 
+        public void ScanContinuously(MobileBarcodeScanningOptions options, Action<Result> scanHandler)
+        {
+            ScanContinuously(null, options, scanHandler);
+        }
+
+        public void ScanContinuously(Context context, MobileBarcodeScanningOptions options, Action<Result> scanHandler)
+        {
+            _continouslyScanHandler = scanHandler;
+            var suitableContext = GetContext(context);
+            var scanIntent = new Intent(suitableContext, typeof(ZxingActivity));
+
+            scanIntent.AddFlags(ActivityFlags.NewTask);
+
+            ZxingActivity.UseCustomOverlayView = true;
+            ZxingActivity.CustomOverlayView = CustomOverlay;
+            ZxingActivity.ScanningOptions = options;
+            ZxingActivity.ScanContinuously = true;
+
+            ZxingActivity.CanceledHandler = () =>
+            {
+                _continouslyScanHandler?.Invoke(null);
+            };
+
+            ZxingActivity.ScanCompletedHandler = result =>
+            {
+                scanHandler?.Invoke(result);
+            };
+
+            suitableContext.StartActivity(scanIntent);
+        }
 
         public Task<Result> Scan(MobileBarcodeScanningOptions options)
         {
@@ -55,8 +85,7 @@ namespace BarcodeReader.ScanQr.Services
         {
             var ctx = GetContext(context);
 
-            var task = Task.Factory.StartNew(() =>
-            {
+            var task = Task.Factory.StartNew(() => {
 
                 var waitScanResetEvent = new System.Threading.ManualResetEvent(false);
 

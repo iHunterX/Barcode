@@ -14,35 +14,58 @@ namespace BarcodeReader.ScanQr.Services
         private readonly ManualResetEvent _scanResultResetEvent = new ManualResetEvent(false);
         private Action<Result> _continousScanHandler;
 
+        public void ScanContinuously(MobileBarcodeScanningOptions options, Action<Result> scanHandler)
+        {
+            try
+            {
+                options.TryInverted = true;
+                _continousScanHandler = scanHandler;
+                UIDevice.CurrentDevice.InvokeOnMainThread(() => {
+                    _qrCodeScanController = new QrCodeScanController(options, this) { ContinuousScanning = true };
+                    _qrCodeScanController.OnScannedResult += barcodeResult => {
+
+                        if (barcodeResult == null)
+                        {
+                            ((UIViewController)_qrCodeScanController).InvokeOnMainThread(() => {
+                                ((UIViewController)_qrCodeScanController).DismissViewController(true, null);
+                            });
+                        }
+
+                        scanHandler(barcodeResult);
+                    };
+
+                    ViewHelper.CurrentController.PresentViewController((UIViewController)_qrCodeScanController, true, null);
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
 
         public Task<Result> Scan(MobileBarcodeScanningOptions options)
         {
-            //options.TryInverted = true;
-            return Task.Factory.StartNew(() =>
-            {
+            options.TryInverted = true;
+            return Task.Factory.StartNew(() => {
 
                 try
                 {
                     _scanResultResetEvent.Reset();
 
                     Result result = null;
-                    UIDevice.CurrentDevice.InvokeOnMainThread(() =>
-                    {
+                    UIDevice.CurrentDevice.InvokeOnMainThread(() => {
 
 
                         _qrCodeScanController = new QrCodeScanController(options, this);
-                        _qrCodeScanController.OnScannedResult += barcodeResult =>
-                        {
+                        _qrCodeScanController.OnScannedResult += barcodeResult => {
 
-                            ((UIViewController)_qrCodeScanController).InvokeOnMainThread(() =>
-                            {
+                            ((UIViewController)_qrCodeScanController).InvokeOnMainThread(() => {
 
                                 _qrCodeScanController.Cancel();
 
                                 try
                                 {
-                                    ((UIViewController)_qrCodeScanController).DismissViewController(true, () =>
-                                    {
+                                    ((UIViewController)_qrCodeScanController).DismissViewController(true, () => {
                                         result = barcodeResult;
                                         _scanResultResetEvent.Set();
                                     });
@@ -54,6 +77,7 @@ namespace BarcodeReader.ScanQr.Services
                                 }
                             });
                         };
+
                         ViewHelper.CurrentController.PresentViewController((UIViewController)_qrCodeScanController, true, null);
                     });
 
@@ -73,8 +97,7 @@ namespace BarcodeReader.ScanQr.Services
 
         public void Cancel()
         {
-            ((UIViewController)_qrCodeScanController)?.InvokeOnMainThread(() =>
-            {
+            ((UIViewController)_qrCodeScanController)?.InvokeOnMainThread(() => {
                 _qrCodeScanController.Cancel();
                 ((UIViewController)_qrCodeScanController).DismissViewController(false, null);
             });

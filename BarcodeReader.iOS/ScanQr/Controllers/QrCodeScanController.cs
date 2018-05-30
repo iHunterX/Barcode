@@ -72,8 +72,7 @@ namespace BarcodeReader.ScanQr.Controllers
                 UseCustomOverlayView = true,
                 CustomOverlayView = Scanner.CustomOverlay
             };
-            _scannerView.OnCancelButtonPressed += delegate
-            {
+            _scannerView.OnCancelButtonPressed += delegate {
                 Scanner.Cancel();
             };
 
@@ -84,64 +83,37 @@ namespace BarcodeReader.ScanQr.Controllers
 
         public override void ViewDidAppear(bool animated)
         {
-            //_scannerView.OnScannerSetupComplete += HandleOnScannerSetupComplete;
+            _scannerView.OnScannerSetupComplete += HandleOnScannerSetupComplete;
 
-            //_originalStatusBarStyle = UIApplication.SharedApplication.StatusBarStyle;
+            _originalStatusBarStyle = UIApplication.SharedApplication.StatusBarStyle;
 
-            //if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
-            //{
-            //    UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.Default;
-            //    SetNeedsStatusBarAppearanceUpdate();
-            //}
-            //else
-            //    UIApplication.SharedApplication.SetStatusBarStyle(UIStatusBarStyle.BlackTranslucent, false);
-
+            if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0))
+            {
+                UIApplication.SharedApplication.StatusBarStyle = UIStatusBarStyle.Default;
+                SetNeedsStatusBarAppearanceUpdate();
+            }
+            else
+                UIApplication.SharedApplication.SetStatusBarStyle(UIStatusBarStyle.BlackTranslucent, false);
             Task.Factory.StartNew(() =>
             {
-                DispatchQueue.MainQueue.DispatchAsync(() => _scannerView.StartScanning(result =>
-                {
-                    _scannerView.StopScanning();
+                BeginInvokeOnMainThread(() => _scannerView.StartScanning(result => {
+                    Console.WriteLine(result);
+                    if (!ContinuousScanning)
+                    {
+                        _scannerView.StopScanning();
+                    }
+
                     var evt = OnScannedResult;
                     evt?.Invoke(result);
                 }, ScanningOptions));
             });
-
-            //Task.Factory.StartNew(() =>
-            //{
-            //    try
-            //    {
-            //        BeginInvokeOnMainThread(() => _scannerView.StartScanning(result =>
-            //        {
-            //            try
-            //            {
-            //                _scannerView.StopScanning();
-            //                var evt = OnScannedResult;
-            //                evt?.Invoke(result);
-
-            //            }
-            //            catch(Exception e)
-            //            {
-
-            //            }
-                        
-            //        }, ScanningOptions));
-            //    }
-            //    catch(Exception e)
-            //    {
-            //    }
-
-            //});
-
-
-
-
         }
 
         public override void ViewDidDisappear(bool animated)
         {
             _scannerView?.StopScanning();
-            if (_scannerView != null) { }
-                //_scannerView.OnScannerSetupComplete -= HandleOnScannerSetupComplete;
+            if (_scannerView != null)
+                _scannerView.OnScannerSetupComplete -= HandleOnScannerSetupComplete;
         }
 
         public override void ViewWillDisappear(bool animated)
